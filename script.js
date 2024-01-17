@@ -2,6 +2,9 @@ let gameboard = function () {
     let board = [];
     let isPlayerStart = 'player';
 
+    const cells = document.querySelectorAll('.cell');
+    const start = document.getElementById('start');
+
     function _boardReset() {
         // Resetting the board to have '.' in each index
         board = [];
@@ -9,8 +12,20 @@ let gameboard = function () {
             board.push('.');
         }
 
+        // Resetting the attribute and removing the SVGs
+        cells.forEach(function (cell, index) {
+            cell.setAttribute('value', '.');
+            cell.innerHTML = '';
+        });
+
         // Randomly select if the computer goes first or the player
         isPlayerStart = Math.random() < 0.5;
+        if (!isPlayerStart) {
+            start.innerHTML = 'Computer is Starting';
+        }
+        else {
+            start.innerHTML = 'Player is Starting';
+        }
 
         return isPlayerStart;
     }
@@ -30,7 +45,7 @@ let gameboard = function () {
         // Putting 'O' in the selected board cell
         board[pool[randNum]] = 'O';
 
-        _render();
+        _render(pool[randNum], 'O');
         return _isGameOver();
     }
 
@@ -68,13 +83,32 @@ let gameboard = function () {
         return 'DRAW';
     }
 
-    function _render() {
-        let s = `
-        ${board[0]}, ${board[1]}, ${board[2]},
-        ${board[3]}, ${board[4]}, ${board[5]},
-        ${board[6]}, ${board[7]}, ${board[8]},
+    function _render(index, sign) {
+        const cell = document.getElementById(`cell-${index}`);
+
+        let xSVG = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <title>window-close</title>
+                <path
+                    d="M13.46,12L19,17.54V19H17.54L12,13.46L6.46,19H5V17.54L10.54,12L5,6.46V5H6.46L12,10.54L17.54,5H19V6.46L13.46,12Z" />
+            </svg>
         `;
-        console.log(s);
+        let oSVG = `
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <title>checkbox-blank-circle-outline</title>
+                <path
+                    d="M12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
+            </svg>
+        `;
+
+        cell.setAttribute('value', sign);
+
+        if (sign === 'X') {
+            cell.innerHTML = xSVG;
+        }
+        else {
+            cell.innerHTML = oSVG;
+        }
     }
 
     function play() {
@@ -84,11 +118,15 @@ let gameboard = function () {
         }
     }
 
-    function playerMove(move) {
-        move = parseInt(move);
+    function playerMove(event) {
+        let move = parseInt((event.target.id).split('-')[1]);
+
+        if (board[move] !== '.') {
+            return 'again';
+        }
 
         board[move] = 'X';
-        _render();
+        _render(move, 'X');
         let isOver = _isGameOver();
 
         if (isOver === 'again') {
@@ -97,7 +135,58 @@ let gameboard = function () {
         return isOver;
     }
 
-    return {play, playerMove};
+    return { play, playerMove };
 };
 
-let x = gameboard();
+let inputs = (function () {
+    let { play, playerMove } = gameboard();
+
+    const cells = document.querySelector('.gameboard');
+    const dialog = document.querySelector("dialog");
+    const dialogH1 = dialog.querySelector('h1');
+    const close = dialog.querySelector('button');
+    const start = document.getElementById('start');
+
+    function indexButtonEvents() {
+        const github = document.getElementById('github');
+        const source = document.getElementById('source');
+        const reset = document.getElementById('reset');
+
+        github.addEventListener('click', () => {
+            window.open('https://github.com/S4M0707', '_blank');
+        });
+
+        source.addEventListener('click', () => {
+            window.open('https://github.com/S4M0707/tic-tac-toe', '_blank');
+        });
+
+        reset.addEventListener('click', play);
+    }
+
+    // Event Listener for the gameboard cells
+    cells.addEventListener('click', (event) => {
+        const result = playerMove(event);
+
+        if (result === 'again') {
+            return result;
+        }
+        if (result === 'O') {
+            dialogH1.innerHTML = "OOPS! Computer Won";
+        }
+        if (result === 'X') {
+            dialogH1.innerHTML = "WOW! You Won";
+        }
+        if (result === 'DRAW') {
+            dialogH1.innerHTML = "There is a DRAW";
+        }
+        dialog.showModal();
+        start.innerHTML = 'Click Play to Start the Game';
+    });
+
+    // Event Listener to close dialog
+    close.addEventListener('click', () => {
+        dialog.close();
+    });
+
+    indexButtonEvents();
+})();

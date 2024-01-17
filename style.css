@@ -124,23 +124,74 @@ header>.info {
 }
 
 main {
+    height: fit-content;
+
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
 
     background-color: var(--color-red);
 }
 
+::backdrop {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+dialog {
+    border-radius: 3rem;
+    border: solid var(--color-red);
+    background-color: var(--color-white);
+    color: var(--color-red);
+}
+
+.dialogContainer {
+    width: 60vh;
+    /* height: 30vh; */
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+dialog button {
+    width: 12rem;
+    height: 3rem;
+
+    font-family: JoshFont, 'Courier New', Courier, monospace;
+    font-weight: 600;
+    font-size: 1.5rem;
+
+    border-radius: 3rem;
+    border: solid var(--color-red);
+    background-color: var(--color-red);
+    color: var(--color-white);
+}
+
+dialog button:hover {
+    outline: solid var(--color-red);
+    background-color: var(--color-white);
+    border-color: var(--color-white);
+    color: var(--color-red);
+}
+
+main>h1 {
+    /* width: 100%; */
+    margin-bottom: 0;
+    color: var(--color-white);
+}
+
 main>.gameboard {
     width: 60vh;
     height: 60vh;
+    margin: 2%;
 
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(3, 1fr);
 
     border: solid var(--color-white);
-    /* border-radius: 1rem; */
 }
 
 .gameboard>.cell {
